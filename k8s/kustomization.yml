@@ -1,0 +1,5 @@
+resources:
+  - secret.yml
+  - db.yml
+  - django.yml
+  - nginx.yml

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-k8s-database
+  labels:
+    app: django-k8s
+spec:
+  selector:
+    matchLabels:
+      app: django-k8s
+      tier: db
+  template:
+    metadata:
+      labels:
+        app: django-k8s
+        tier: db
+    spec:
+      containers:
+        - name: postgresql
+          image: postgres:latest
+          envFrom:
+            - secretRef:
+                name: django-k8s-database-cred
+          ports:
+            - containerPort: 5432
+          resources:
+            limits:
+              cpu: 1500m
+              ephemeral-storage: 1G
+              memory: 600M
+            requests:
+              cpu: 1500m
+              ephemeral-storage: 1G
+              memory: 600M
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-k8s-database
+  labels:
+    app: django-k8s
+spec:
+  selector:
+    app: django-k8s
+    tier: db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  clusterIP: None

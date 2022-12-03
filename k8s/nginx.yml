@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-k8s-nginx
+  labels:
+    app: django-k8s
+spec:
+  selector:
+    matchLabels:
+      app: django-k8s
+      tier: nginx
+  template:
+    metadata:
+      name: django-k8s-nginx
+      labels:
+        app: django-k8s
+        tier: nginx
+    spec:
+      imagePullSecrets:
+        - name: finopia-nexus
+      containers:
+        - name: nginx
+          resources:
+            limits:
+              cpu: 1500m
+              ephemeral-storage: 1G
+              memory: 600M
+            requests:
+              cpu: 1500m
+              ephemeral-storage: 1G
+              memory: 600M
+          image: nexus.finopia.dev/aenginx:latest
+          ports:
+            - containerPort: 80
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-k8s-nginx
+  labels:
+    app: django-k8s
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  type: LoadBalancer

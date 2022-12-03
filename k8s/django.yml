@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-k8s-app
+  labels:
+    app: django-k8s
+spec:
+  selector:
+    matchLabels:
+      app: django-k8s
+      tier: app
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: django-k8s
+        tier: app
+    spec:
+      imagePullSecrets:
+        - name: finopia-nexus
+      containers:
+        - name: django-k8s-app
+          image: nexus.finopia.dev/aedjango:latest
+          resources:
+            limits:
+              cpu: 1500m
+              ephemeral-storage: 1G
+              memory: 600M
+            requests:
+              cpu: 1500m
+              ephemeral-storage: 1G
+              memory: 600M
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: django-k8s-database-cred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-k8s-app
+  labels:
+    app: django-k8s
+spec:
+  selector:
+    app: django-k8s
+    tier: app
+  ports:
+    - port: 8080
+      targetPort: 8080
+  clusterIP: None
+

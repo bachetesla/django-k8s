@@ -21,6 +21,7 @@ spec:
       containers:
         - name: django-k8s-app
           image: nexus.finopia.dev/aedjango:latest
+          imagePullPolicy: Always
           resources:
             limits:
               cpu: 1500m
